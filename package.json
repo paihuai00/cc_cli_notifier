@@ -4,7 +4,7 @@
   "description": "Claude Code hook notifier for Feishu, WeCom, Ruliu, and generic webhooks.",
   "type": "module",
   "bin": {
-    "cc-notifier": "./bin/cc-notifier.js"
+    "cc-notifier": "bin/cc-notifier.js"
   },
   "files": [
     "bin",
