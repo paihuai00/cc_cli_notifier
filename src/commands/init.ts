@@ -37,6 +37,30 @@ function defaultEnvFor(provider: ProviderType): string {
   return 'GENERIC_WEBHOOK_URL';
 }
 
+function looksLikeUrl(value: string): boolean {
+  return /^https?:\/\//i.test(value);
+}
+
+function isValidEnvName(value: string): boolean {
+  return /^[A-Za-z_][A-Za-z0-9_]*$/.test(value);
+}
+
+function validateEnvOption(envName: string, provider: ProviderType, logger: Logger): boolean {
+  const defaultEnv = defaultEnvFor(provider);
+  if (looksLikeUrl(envName)) {
+    logger.error('--env expects an environment variable name, not a webhook URL.');
+    logger.error(`Use: export ${defaultEnv}="${envName}"`);
+    logger.error(`Then run: cc-notifier init --provider ${provider} --env ${defaultEnv}`);
+    return false;
+  }
+  if (!isValidEnvName(envName)) {
+    logger.error(`Invalid environment variable name: ${envName}`);
+    logger.error(`Use a name like ${defaultEnv}, then set it to your webhook URL.`);
+    return false;
+  }
+  return true;
+}
+
 async function promptForOptions(options: InitOptions): Promise<InitOptions> {
   if (options.provider && options.env) return options;
   if (!process.stdin.isTTY || options.yes) return options;
@@ -60,6 +84,9 @@ async function promptForOptions(options: InitOptions): Promise<InitOptions> {
 
 export async function runInit(args: string[], logger: Logger): Promise<number> {
   const options = await promptForOptions(parseOptions(args));
+  if (options.provider && options.env && !validateEnvOption(options.env, options.provider, logger)) {
+    return 1;
+  }
   const provider = options.provider && options.env ? { type: options.provider, envName: options.env } : undefined;
   const configPath = writeDefaultConfig(provider);
   const result = installHooks();

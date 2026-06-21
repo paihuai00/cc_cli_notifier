@@ -47,6 +47,8 @@ cc-notifier doctor
 cc-notifier test
 ```
 
+`--env` expects the environment variable name (`RULIU_BOT_WEBHOOK`), not the webhook URL itself.
+
 ### WeCom
 
 ```bash
@@ -158,6 +160,17 @@ Example global config:
 
 Secrets should usually be referenced through environment variables using the `env:NAME` syntax. Avoid committing real webhook URLs to project repositories.
 
+When running `cc-notifier init`, pass the environment variable name to `--env`, not the URL:
+
+```bash
+# Correct
+export RULIU_BOT_WEBHOOK="https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=..."
+cc-notifier init --provider ruliu --env RULIU_BOT_WEBHOOK
+
+# Incorrect
+cc-notifier init --provider ruliu --env "https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=..."
+```
+
 ## Change webhook or provider
 
 To change only the webhook URL, update the environment variable:
@@ -183,7 +196,7 @@ vim ~/.cc-notifier/config.json
 ## Commands
 
 ```bash
-cc-notifier init [--provider feishu|wecom|ruliu|webhook --env NAME] [--yes]
+cc-notifier init [--provider feishu|wecom|ruliu|webhook --env ENV_NAME] [--yes]
 cc-notifier uninstall
 cc-notifier doctor
 cc-notifier test

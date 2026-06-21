@@ -1,6 +1,6 @@
 {
   "name": "cc-notifier",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Claude Code hook notifier for Feishu, WeCom, Ruliu, and generic webhooks.",
   "type": "module",
   "bin": {
