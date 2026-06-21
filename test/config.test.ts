@@ -38,7 +38,7 @@ test('init config preserves existing settings and prepends requested provider', 
       providers: [{ type: 'feishu', enabled: true, webhookUrl: 'env:OLD_FEISHU' }],
     }), 'utf8');
 
-    writeDefaultConfig({ type: 'ruliu', envName: 'RULIU_BOT_WEBHOOK' });
+    writeDefaultConfig({ type: 'ruliu', secret: { kind: 'env', name: 'RULIU_BOT_WEBHOOK' } });
     const parsed = JSON.parse(fs.readFileSync(configPath, 'utf8')) as {
       notifyOn: string[];
       quietHours: { enabled: boolean };
@@ -74,6 +74,59 @@ test('init rejects webhook URL passed to --env', async () => {
     assert.ok(messages.error.some((message) => message.includes('--env expects an environment variable name')));
     assert.equal(fs.existsSync(path.join(tmpHome, '.cc-notifier', 'config.json')), false);
     assert.equal(fs.existsSync(path.join(tmpHome, '.claude', 'settings.json')), false);
+  } finally {
+    process.chdir(originalCwd);
+    if (originalHome === undefined) delete process.env.HOME;
+    else process.env.HOME = originalHome;
+    fs.rmSync(tmpHome, { recursive: true, force: true });
+  }
+});
+
+test('init supports storing webhook URL directly with --url', async () => {
+  const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-notifier-test-'));
+  const originalCwd = process.cwd();
+  process.env.HOME = tmpHome;
+  process.chdir(tmpHome);
+  try {
+    const { logger, messages } = createTestLogger();
+    const webhookUrl = 'https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=secret';
+    const exitCode = await runInit(['--provider', 'ruliu', '--url', webhookUrl, '--yes'], logger);
+
+    assert.equal(exitCode, 0);
+    assert.ok(messages.info.some((message) => message.includes('direct webhook URL')));
+    const configPath = path.join(tmpHome, '.cc-notifier', 'config.json');
+    const parsed = JSON.parse(fs.readFileSync(configPath, 'utf8')) as {
+      providers: Array<{ type: string; webhookUrl?: string }>;
+    };
+    assert.equal(parsed.providers[0]?.type, 'ruliu');
+    assert.equal(parsed.providers[0]?.webhookUrl, webhookUrl);
+  } finally {
+    process.chdir(originalCwd);
+    if (originalHome === undefined) delete process.env.HOME;
+    else process.env.HOME = originalHome;
+    fs.rmSync(tmpHome, { recursive: true, force: true });
+  }
+});
+
+test('init rejects NAME=URL passed to --env', async () => {
+  const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-notifier-test-'));
+  const originalCwd = process.cwd();
+  process.env.HOME = tmpHome;
+  process.chdir(tmpHome);
+  try {
+    const { logger, messages } = createTestLogger();
+    const exitCode = await runInit([
+      '--provider',
+      'ruliu',
+      '--env',
+      'RULIU_BOT_WEBHOOK=https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=secret',
+      '--yes',
+    ], logger);
+
+    assert.equal(exitCode, 1);
+    assert.ok(messages.error.some((message) => message.includes('not NAME=URL')));
+    assert.ok(messages.error.some((message) => message.includes('--url')));
+    assert.equal(fs.existsSync(path.join(tmpHome, '.cc-notifier', 'config.json')), false);
   } finally {
     process.chdir(originalCwd);
     if (originalHome === undefined) delete process.env.HOME;

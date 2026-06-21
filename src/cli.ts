@@ -7,7 +7,7 @@ import { runUninstall } from './commands/uninstall.js';
 import { createLogger } from './runtime/logger.js';
 
 function printHelp(): void {
-  process.stdout.write(`cc-notifier\n\nUsage:\n  cc-notifier init [--provider feishu|wecom|ruliu|webhook --env ENV_NAME]\n  cc-notifier uninstall\n  cc-notifier doctor\n  cc-notifier test\n  cc-notifier hook --event Stop|PermissionRequest\n  cc-notifier config\n\nNote:\n  --env expects an environment variable name, not a webhook URL.\n`);
+  process.stdout.write(`cc-notifier\n\nUsage:\n  cc-notifier init [--provider feishu|wecom|ruliu|webhook (--env ENV_NAME | --url WEBHOOK_URL)]\n  cc-notifier uninstall\n  cc-notifier doctor\n  cc-notifier test\n  cc-notifier hook --event Stop|PermissionRequest\n  cc-notifier config\n\nNote:\n  --env expects an environment variable name, not a webhook URL.\n  --url stores the webhook URL directly in ~/.cc-notifier/config.json.\n`);
 }
 
 async function main(): Promise<number> {

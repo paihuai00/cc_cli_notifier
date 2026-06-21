@@ -4,6 +4,15 @@ import { findProjectConfig, globalConfigPath } from './paths.js';
 import { mergeConfig } from './merge.js';
 import { defaultConfig, validateConfig, type CcNotifierConfig, type ProviderConfig, type ProviderType } from './schema.js';
 
+export type InitProviderSecret =
+  | { kind: 'env'; name: string }
+  | { kind: 'url'; value: string };
+
+export interface InitProviderConfig {
+  type: ProviderType;
+  secret: InitProviderSecret;
+}
+
 function readJsonIfExists(filePath: string | undefined): unknown {
   if (!filePath || !fs.existsSync(filePath)) return undefined;
   const raw = fs.readFileSync(filePath, 'utf8');
@@ -33,11 +42,16 @@ export function loadConfig(cwd?: string): { config: CcNotifierConfig; paths: str
   return { config, paths, errors: validateConfig(config) };
 }
 
-function providerFromInit(provider: { type: ProviderType; envName: string }): ProviderConfig {
-  if (provider.type === 'feishu') return { type: 'feishu', enabled: true, webhookUrl: `env:${provider.envName}` };
-  if (provider.type === 'wecom') return { type: 'wecom', enabled: true, webhookUrl: `env:${provider.envName}` };
-  if (provider.type === 'ruliu') return { type: 'ruliu', enabled: true, webhookUrl: `env:${provider.envName}` };
-  return { type: 'webhook', enabled: true, url: `env:${provider.envName}` };
+function providerSecretValue(secret: InitProviderSecret): string {
+  return secret.kind === 'env' ? `env:${secret.name}` : secret.value;
+}
+
+function providerFromInit(provider: InitProviderConfig): ProviderConfig {
+  const value = providerSecretValue(provider.secret);
+  if (provider.type === 'feishu') return { type: 'feishu', enabled: true, webhookUrl: value };
+  if (provider.type === 'wecom') return { type: 'wecom', enabled: true, webhookUrl: value };
+  if (provider.type === 'ruliu') return { type: 'ruliu', enabled: true, webhookUrl: value };
+  return { type: 'webhook', enabled: true, url: value };
 }
 
 export function mergeDefaultNotifyOn(config: CcNotifierConfig): CcNotifierConfig {
@@ -48,7 +62,7 @@ export function mergeDefaultNotifyOn(config: CcNotifierConfig): CcNotifierConfig
   return { ...config, notifyOn };
 }
 
-export function writeDefaultConfig(provider?: { type: ProviderType; envName: string }): string {
+export function writeDefaultConfig(provider?: InitProviderConfig): string {
   const filePath = globalConfigPath();
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 

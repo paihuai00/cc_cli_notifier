@@ -39,15 +39,26 @@ cc-notifier test
 
 ### Baidu IM / 如流
 
+Simple setup, stores the webhook URL directly in `~/.cc-notifier/config.json`:
+
 ```bash
 npm install -g cc-notifier
-cc-notifier init --provider ruliu --env RULIU_BOT_WEBHOOK
-export RULIU_BOT_WEBHOOK="https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=..."
+cc-notifier init --provider ruliu --url 'https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=...' --yes
 cc-notifier doctor
 cc-notifier test
 ```
 
-`--env` expects the environment variable name (`RULIU_BOT_WEBHOOK`), not the webhook URL itself.
+Safer setup, stores only an environment variable reference in the config file:
+
+```bash
+npm install -g cc-notifier
+export RULIU_BOT_WEBHOOK="https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=..."
+cc-notifier init --provider ruliu --env RULIU_BOT_WEBHOOK --yes
+cc-notifier doctor
+cc-notifier test
+```
+
+`--env` expects the environment variable name (`RULIU_BOT_WEBHOOK`), not the webhook URL itself. Use `--url` if you want to pass the webhook URL directly.
 
 ### WeCom
 
@@ -160,14 +171,17 @@ Example global config:
 
 Secrets should usually be referenced through environment variables using the `env:NAME` syntax. Avoid committing real webhook URLs to project repositories.
 
-When running `cc-notifier init`, pass the environment variable name to `--env`, not the URL:
+When running `cc-notifier init`, choose one of these modes:
 
 ```bash
-# Correct
+# Simple: store the webhook URL directly in ~/.cc-notifier/config.json
+cc-notifier init --provider ruliu --url "https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=..."
+
+# Safer: store only an environment variable reference in config
 export RULIU_BOT_WEBHOOK="https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=..."
 cc-notifier init --provider ruliu --env RULIU_BOT_WEBHOOK
 
-# Incorrect
+# Incorrect: --env is not for webhook URLs
 cc-notifier init --provider ruliu --env "https://apiin.im.baidu.com/api/msg/groupmsgsend?access_token=..."
 ```
 
@@ -196,7 +210,7 @@ vim ~/.cc-notifier/config.json
 ## Commands
 
 ```bash
-cc-notifier init [--provider feishu|wecom|ruliu|webhook --env ENV_NAME] [--yes]
+cc-notifier init [--provider feishu|wecom|ruliu|webhook (--env ENV_NAME | --url WEBHOOK_URL)] [--yes]
 cc-notifier uninstall
 cc-notifier doctor
 cc-notifier test
