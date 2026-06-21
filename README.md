@@ -1,6 +1,6 @@
 # cc-notifier
 
-`cc-notifier` sends notifications for Claude Code `Stop` and `PermissionRequest` hooks.
+`cc-notifier` sends notifications for Claude Code `Stop` and `PermissionRequest` hooks..
 
 ## Quick start
 
