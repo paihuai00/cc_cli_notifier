@@ -1,7 +1,7 @@
 {
   "name": "cc-notifier",
   "version": "0.1.0",
-  "description": "Claude Code Stop hook notifier for Feishu, WeCom, and generic webhooks.",
+  "description": "Claude Code hook notifier for Feishu, WeCom, Ruliu, and generic webhooks.",
   "type": "module",
   "bin": {
     "cc-notifier": "./bin/cc-notifier.js"
@@ -9,7 +9,8 @@
   "files": [
     "bin",
     "dist/src",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=18"
@@ -26,10 +27,25 @@
     "claude",
     "hooks",
     "notifier",
+    "notification",
     "feishu",
-    "wecom"
+    "wecom",
+    "ruliu",
+    "webhook"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paihuai00/cc_cli_notifier.git"
+  },
+  "bugs": {
+    "url": "https://github.com/paihuai00/cc_cli_notifier/issues"
+  },
+  "homepage": "https://github.com/paihuai00/cc_cli_notifier#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "typescript": "^5.5.0"
