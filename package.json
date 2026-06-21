@@ -1,0 +1,37 @@
+{
+  "name": "cc-notifier",
+  "version": "0.1.0",
+  "description": "Claude Code Stop hook notifier for Feishu, WeCom, and generic webhooks.",
+  "type": "module",
+  "bin": {
+    "cc-notifier": "./bin/cc-notifier.js"
+  },
+  "files": [
+    "bin",
+    "dist/src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test dist/test/*.test.js",
+    "pretest": "npm run build",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "claude-code",
+    "claude",
+    "hooks",
+    "notifier",
+    "feishu",
+    "wecom"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.5.0"
+  }
+}

@@ -1,0 +1,13 @@
+export async function readStdin(): Promise<string> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of process.stdin) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+export async function readJsonFromStdin(): Promise<unknown> {
+  const raw = await readStdin();
+  if (!raw.trim()) return {};
+  return JSON.parse(raw);
+}
